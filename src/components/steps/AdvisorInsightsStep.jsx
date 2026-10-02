@@ -32,10 +32,16 @@ export default function AdvisorInsightsStep({ client }) {
         <div>
           <h4 className="mb-3 font-semibold text-brand">Customer Risk Appetite</h4>
           <div className="space-y-3 rounded-xl border border-hairline bg-slate-50/50 p-4">
-            <Pill className="bg-accent text-black">{event.riskAppetite.label}</Pill>
-            <p className="text-sm leading-relaxed text-ink-muted">{event.riskAppetite.summary}</p>
-            <p className="text-sm leading-relaxed text-ink-muted">{event.riskAppetite.eventImpact}</p>
-            <p className="text-sm font-medium leading-relaxed text-brand">{event.riskAppetite.advisorNote}</p>
+            {event.riskAppetite ? (
+              <>
+                <Pill className="bg-accent text-black">{event.riskAppetite.label}</Pill>
+                <p className="text-sm leading-relaxed text-ink-muted">{event.riskAppetite.summary}</p>
+                <p className="text-sm leading-relaxed text-ink-muted">{event.riskAppetite.eventImpact}</p>
+                <p className="text-sm font-medium leading-relaxed text-brand">{event.riskAppetite.advisorNote}</p>
+              </>
+            ) : (
+              <p className="text-sm text-ink-muted">Risk appetite not yet assessed for this client.</p>
+            )}
           </div>
         </div>
       </div>

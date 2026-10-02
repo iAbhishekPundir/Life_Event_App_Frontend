@@ -1,7 +1,8 @@
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react'
 import { TASK_STATUS_STYLES } from '../../utils/formatters'
 import { useWorkflowSession } from '../../context/WorkflowSessionContext'
 import { useCaseStatus } from '../../context/CaseStatusContext'
+import { groupProductsByDivision } from '../../data/productDivisions'
 
 export default function WorkflowOrchestrationStep({ client }) {
   const session = useWorkflowSession(client.id)
@@ -18,26 +19,50 @@ export default function WorkflowOrchestrationStep({ client }) {
     <div className="space-y-6">
       {isClosed && (
         <div
-          className={`flex items-center gap-3 rounded-xl border p-4 ${
+          className={`rounded-xl border p-4 ${
             currentStatus === 'Converted' ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'
           }`}
         >
-          {currentStatus === 'Converted' ? (
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
-          ) : (
-            <XCircle className="h-5 w-5 shrink-0 text-red-500" />
-          )}
-          <div>
-            <p className={`text-sm font-semibold ${currentStatus === 'Converted' ? 'text-emerald-700' : 'text-red-700'}`}>
-              Case {currentStatus === 'Converted' ? 'Closed — Converted' : 'Closed — Not Interested'}
-            </p>
-            <p className="mt-0.5 text-xs text-ink-muted">
-              {caseId && <span className="font-medium">{caseId} · </span>}
-              {currentStatus === 'Converted'
-                ? 'CRM hand-off triggered. Onboarding to be completed externally.'
-                : 'Client declined all recommended products. Case has been closed.'}
-            </p>
+          <div className="flex items-center gap-3">
+            {currentStatus === 'Converted' ? (
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+            ) : (
+              <XCircle className="h-5 w-5 shrink-0 text-red-500" />
+            )}
+            <div>
+              <p className={`text-sm font-semibold ${currentStatus === 'Converted' ? 'text-emerald-700' : 'text-red-700'}`}>
+                Case {currentStatus === 'Converted' ? 'Closed — Converted' : 'Closed — Not Interested'}
+              </p>
+              <p className="mt-0.5 text-xs text-ink-muted">
+                {caseId && <span className="font-medium">{caseId} · </span>}
+                {currentStatus === 'Converted'
+                  ? 'CRM hand-off triggered. Onboarding to be completed externally.'
+                  : 'Client declined all recommended products. Case has been closed.'}
+              </p>
+            </div>
           </div>
+
+          {currentStatus === 'Converted' && session.selectedProducts.length > 0 && (
+            <div className="mt-4 space-y-2 border-t border-emerald-200 pt-4">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">Handed off to</p>
+              {groupProductsByDivision(session.selectedProducts).map(({ division, nextStep, products }) => (
+                <div key={division} className="rounded-lg bg-white/70 p-3">
+                  <div className="flex items-center gap-1.5">
+                    <ArrowRight className="h-3 w-3 shrink-0 text-emerald-600" />
+                    <span className="text-sm font-semibold text-brand">{division}</span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {products.map((title) => (
+                      <span key={title} className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                        {title}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-xs text-ink-muted">{nextStep}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

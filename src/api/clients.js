@@ -112,6 +112,11 @@ export async function fetchClientWorkflow(clientId) {
 
     // backend calls these keyDrivers; components read `signals`
     signals: detection.keyDrivers ?? [],
+
+    // Lets the UI tell "detected but below the actionable threshold" apart
+    // from a fully-loaded event — recommendations/talkingPoints/riskAppetite
+    // are empty/null below, by design, whenever this is false.
+    actionable: detection.actionable,
   }
 
   // Recommendations/advisor-brief/orchestrate all require an *actionable*

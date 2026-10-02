@@ -38,6 +38,15 @@ export default function StepDetailPage() {
 
   const StepContent = STEP_COMPONENTS[step.id]
 
+  // Event Detection renders even for a weak/non-actionable signal (that's
+  // the point — the advisor can see it was picked up). The other four
+  // steps depend on recommendations/advisor-brief/orchestrate, which the
+  // backend never populates for a non-actionable event (they 409), so they
+  // fall back to the same "nothing to do" empty state as a fully-absent
+  // event instead of rendering with missing data.
+  const needsActionableEvent = step.id !== 'event-detection'
+  const noActionableSignal = !client.event || (needsActionableEvent && !client.event.actionable)
+
   return (
     <div className="mx-auto max-w-7xl animate-fade-in-up">
       <ClientHeader client={client} />
@@ -56,7 +65,7 @@ export default function StepDetailPage() {
               <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
                 Could not load this client's workflow: {error.message}
               </div>
-            ) : !client.event ? (
+            ) : noActionableSignal ? (
               <div className="py-8 text-center">
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
                   <CheckCircle2 className="h-6 w-6 text-emerald-500" />
